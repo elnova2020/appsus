@@ -19,7 +19,7 @@ class _AppHeader extends React.Component {
     componentWillUnmount() {
         this.unsubscribe();
     }
-    
+
     goToAbout = () => {
         this.props.history.push('/about');
     }        
@@ -30,10 +30,10 @@ class _AppHeader extends React.Component {
             <nav>
                 <ul>
                     <li><NavLink exact to="/">Home</NavLink></li>
-                    <li><NavLink to="/bookapp">ME Book</NavLink></li>
-                    <li><NavLink to="/mailapp">ME Mail</NavLink></li>
-                    <li><NavLink to="/keepapp">ME Keep</NavLink></li>
-                    <li><NavLink to="/about">About</NavLink></li>
+                    <li><NavLink exact to="/book">ME Book</NavLink></li>
+                    <li><NavLink exact to="/mailapp">ME Mail</NavLink></li>
+                    <li><NavLink exact to="/keep">ME Keep</NavLink></li>
+                    <li><NavLink exact to="/about">About</NavLink></li>
                 </ul>
                 <div className="center">
                     <h1>My App</h1>

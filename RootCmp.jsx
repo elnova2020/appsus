@@ -1,9 +1,9 @@
 import { AppHeader } from './cmps/AppHeader.jsx';
 import { About } from './pages/About.jsx';
 import { Home } from './pages/Home.jsx';
-import {BookAppPage} from './pages/BookAppPage.jsx'
-import {KeepAppPage} from './pages/KeepAppPage.jsx'
-import {MailAppPage} from './pages/MailAppPage.jsx'
+import {BookApp} from './apps/Books/pages/book-app.jsx'
+import {BookDetails} from './apps/Books/cmps/book-details.jsx'
+import {MissKeep} from './apps/Keep/pages/MissKeep.jsx'
 
 const Router = ReactRouterDOM.HashRouter;
 const { Route, Switch } = ReactRouterDOM;
@@ -14,13 +14,13 @@ export class RootCmp extends React.Component {
     render() {
         return (
             <Router>
-                <section className="app">
+                <section className="main-app">
                     <AppHeader />
                     <Switch>
-                        <Route path="/bookapp" component={BookAppPage} />
-                        <Route path="/keepapp" component={KeepAppPage} />
-                        <Route path="/mailapp" component={MailAppPage} />
-                        <Route path="/about" component={About} />
+                        <Route path="/book/:bookId" component={BookDetails} />
+                        <Route path="/book" component={BookApp} />
+                        <Route path="/keep" exact component={MissKeep} />
+                        <Route exact component={About} path="/about"  />
                         <Route path="/" component={Home} />
                     </Switch>
                     <footer className="animate__animated animate__jello">coffeerights 2020</footer>
