@@ -3,7 +3,7 @@ import { About } from './pages/About.jsx';
 import { Home } from './pages/Home.jsx';
 import {BookAppPage} from './pages/BookAppPage.jsx'
 import {KeepAppPage} from './pages/KeepAppPage.jsx'
-import {MailAppPage} from './pages/MailAppPage.jsx'
+import {MailApp} from './apps/Mail/MailApp.jsx'
 
 const Router = ReactRouterDOM.HashRouter;
 const { Route, Switch } = ReactRouterDOM;
@@ -19,7 +19,7 @@ export class RootCmp extends React.Component {
                     <Switch>
                         <Route path="/bookapp" component={BookAppPage} />
                         <Route path="/keepapp" component={KeepAppPage} />
-                        <Route path="/mailapp" component={MailAppPage} />
+                        <Route path="/mailapp" component={MailApp} />
                         <Route path="/about" component={About} />
                         <Route path="/" component={Home} />
                     </Switch>
