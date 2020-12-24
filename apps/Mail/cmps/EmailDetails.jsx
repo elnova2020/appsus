@@ -1,4 +1,6 @@
 import { emailService } from '../services/emailService.js'
+import { utilService } from '../../../services/utilService.js'
+
 
 
 export class EmailDetails extends React.Component {
@@ -8,14 +10,12 @@ export class EmailDetails extends React.Component {
     };
 
     componentDidUpdate(prevProps) {
-        console.log('UPDATE', this.props);
         if (prevProps.match.params.emailId !== this.props.match.params.emailId) {
             this.loadEmail()
         }
     }
 
     componentDidMount() {
-        console.log('MOUNT', this.props);
         this.loadEmail();
     }
 
@@ -30,16 +30,47 @@ export class EmailDetails extends React.Component {
         this.props.history.goBack()
     };
 
-    render() {
-        if (!this.state.email) return <div>Loading..</div>;
-
-        return (
-            <section className="email-details">
-                <h1>email Details {this.state.email.subject}</h1>
-                <pre>{JSON.stringify(this.state.email, null, 2)}</pre>
-                <hr />
-                <button onClick={this.onBack}>Back</button>
-            </section>
-        );
+    onRemoveEmail = (emailId) => {
+        emailService.remove(emailId).then(() => {
+            this.loadEmails()
+        })
     }
+
+    onReplayEmail = () => {
+
+    }
+
+    render() {
+        const sentAt = utilService.getFormattedDate(this.props.email.sentAt)
+        return (
+            <section className="email-body">
+                <div >
+                    <p>{this.props.email.from}</p>
+                    <p>{sentAt}</p>
+                </div>
+                <hr />
+                <h2>{this.props.email.title}</h2>
+                <p>{this.props.email.body}</p>
+                <button onClick={this.onBack} >
+                    Back
+                </button> 
+                <button onClick={this.onRemoveEmail} >
+                   delete
+                </button>
+                <button onClick={this.onReplayEmail} >
+                   replay
+                </button>
+                
+            </section>
+        )
+    }
+
 }
+
+
+
+
+
+
+
+
