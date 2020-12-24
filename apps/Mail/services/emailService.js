@@ -5,14 +5,18 @@ import { storageService } from '../../../services/storageService.js'
 
 export const emailService = {
     query,
-    _add,
+    addEmail,
     remove,
     removeEmail,
     emailRead,
     emailStar,
     toggleRead,
+    saveEmailsToStorage,
+    sortEmails,
     getEmailsCount,
-    getEmailById
+    getEmailById,
+    sendEmail,
+    unreadMailCount
 }
 
 const KEY = 'emailsDB';
@@ -25,7 +29,7 @@ function _createEmails() {
     gEmails = storageService.load(KEY);
     if (!gEmails || !gEmails.length) {
         gEmails = _getDemoEmails()
-        _saveEmailsToStorage();
+        saveEmailsToStorage();
     }
 }
 
@@ -33,10 +37,11 @@ function query() {
     return Promise.resolve(gEmails);
 }
 
-//to check what way is better?//
+//which way is better?//
+
 function remove(emailId) {
     gEmails = gEmails.filter(email => email.id !== emailId);
-    _saveEmailsToStorage();
+    saveEmailsToStorage();
     return Promise.resolve();
 }
 
@@ -46,26 +51,34 @@ function removeEmail(id) {
             if (!email.isDeleted) {
                 email.isDeleted = true;
             }
-            else emails.splice(idx, 1)
+            else gEmails.splice(idx, 1)
         }
     })
-    _saveEmailsToStorage()
+    saveEmailsToStorage()
+}
+
+function removeSelectedEmail(emailId) {
+    const idx = gEmails.findIndex(email => email.id === emailId)
+    if (idx === -1) return Promise.reject('Did Not Remove Email')
+    gEmails.splice(idx, 1)
+    saveEmailsToStorage()
+    return Promise.resolve(gEmails)
 }
 
 /************************** */
 
-function _saveEmailsToStorage() {
+function saveEmailsToStorage() {
     storageService.save('emailsDB', gEmails)
 }
 
-function _add(email) {
+function addEmail(email) {
     const emailToAdd = {
         id: utilService.makeId(),
         ...email
     };
-gEmails = [emailToAdd, ...gEmails];
-    _saveEmailsToStorage();
-    return Promise.resolve(emailToAdd); 
+    gEmails = [emailToAdd, ...gEmails];
+    saveEmailsToStorage();
+    return Promise.resolve(emailToAdd);
 }
 
 
@@ -79,6 +92,8 @@ function _getDemoEmails() {
             isStar: true,
             isRead: false,
             isDeleted: false,
+            isSent: false,
+            sentAt: 1551133930594
         },
         {
             id: utilService.makeId(),
@@ -88,6 +103,8 @@ function _getDemoEmails() {
             isStar: false,
             isRead: true,
             isDeleted: false,
+            isSent: false,
+            sentAt: 1551133930594
         },
         {
             id: utilService.makeId(),
@@ -97,12 +114,12 @@ function _getDemoEmails() {
             isStar: false,
             isRead: false,
             isDeleted: false,
+            isSent: false,
+            sentAt: 1551133930594
         }
     ];
     return emails;
 }
-
-
 
 
 function emailRead(emailRead) {
@@ -111,7 +128,7 @@ function emailRead(emailRead) {
             email.isRead = true;
         }
     })
-    _saveEmailsToStorage()
+    saveEmailsToStorage()
 }
 
 function toggleRead(emailRead) {
@@ -120,7 +137,7 @@ function toggleRead(emailRead) {
             email.isRead = !email.isRead
         }
     })
-    _saveEmailsToStorage()
+    saveEmailsToStorage()
 }
 
 function emailStar(emailStarred) {
@@ -129,14 +146,49 @@ function emailStar(emailStarred) {
             email.isStar = !email.isStar
         }
     })
-    _saveEmailsToStorage()
+    saveEmailsToStorage()
 }
+
+
+function sortEmails(emails, sortBy) {
+    sortBy = sortBy.toLowerCase()
+    if (sortBy === 'title') {
+        emails.sort(function (a, b) {
+            var email1 = a.title
+            var email2 = b.title
+            email1 = email1.toLowerCase()
+            email2 = email2.toLowerCase()
+            if (email1 < email2) return -1
+            if (email1 > email2) return 1
+            return 0;
+        })
+    } else {
+        emails.sort(function (a, b) {
+            return b.sentAt - a.sentAt
+        })
+    }
+    return emails
+}
+
 
 
 function getEmailsCount() {
     return gEmails.length
 }
 
+function unreadMailCount() {
+    let count = gEmails.filter(function (email) { return !email.isRead; }).length;
+    if (!count) return 0;
+    return count;
+}
+
 function getEmailById(emailId) {
-    return emails.find(email => email.id === emailId)
-  }
+    return gEmails.find(email => email.id === emailId)
+}
+
+
+function sendEmail(){
+    gEmails.push(email);
+    saveEmailsToStorage()
+    return Promise.resolve(gEmails);
+}

@@ -1,6 +1,7 @@
 import { EmailList } from './cmps/EmailList.jsx'
 import { EmailFilter } from './cmps/EmailFilter.jsx'
-import {emailService } from './services/emailService.js'
+import { EmailCompose } from './cmps/EmailCompose.jsx'
+import { emailService } from './services/emailService.js'
 
 const { Link } = ReactRouterDOM;
 
@@ -15,24 +16,21 @@ export class MailApp extends React.Component {
     };
 
     componentDidMount() {
-       this.loadEmails(); 
+        this.loadEmails();
     }
 
-    componentWillUnmount() {
-    }
-
-    loadPets = () => {
+    loadEmails = () => {
         emailService.query().then(emails => {
             this.setState({ emails });
         });
     }
 
 
-    onRemoveEmail = (emailId) => {
-        emailService.remove(emailId).then(() => {
-            this.loadEmails()
-        })
-    }
+    // onRemoveEmail = (emailId) => {
+    //     emailService.remove(emailId).then(() => {
+    //         this.loadEmails()
+    //     })
+    // }
 
     getEmailsForDisplay = () => {
         const txt = filterBy.title.toLowerCase()
@@ -47,15 +45,23 @@ export class MailApp extends React.Component {
         this.setState({ filterBy });
     }
 
+
+    onAddNewEmail = (email) => {
+        emailService.addEmail(email)
+            .then(() => this.loadEmails())
+
+    }
+
+
     render() {
 
         const emailsForDisplay = this.getEmailsForDisplay();
         return (
             <section className="mail-app">
                 <EmailFilter setFilter={this.onSetFilter} />
-                <Link className="btn">Add Mail</Link>
-                <h2>Emails</h2>
-                <EmailList emails={emailsForDisplay} onRemove={this.onRemoveEmail} />
+                {/* <button className="compose-btn"> +Compose</button> */}
+                <Link className="compose-btn"><EmailCompose addNewEmail={this.onAddNewEmail}/> +Compose </Link>
+                <EmailList emails={emailsForDisplay} />
             </section>
         );
     }

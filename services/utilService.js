@@ -1,5 +1,6 @@
 export const utilService = {
-    makeId
+    makeId,
+    getFormattedDate
 };
 
 function makeId(length = 4) {
@@ -12,3 +13,17 @@ function makeId(length = 4) {
 
     return txt;
 }
+
+
+function getFormattedDate(timestamp) {
+
+    var a = new Date(timestamp);
+    var year = a.getFullYear();
+    var month = a.getMonth() + 1;
+    var date = a.getDate();
+  
+    var time = date + '/' + month + '/' + year
+  
+    return time;
+  
+  }
