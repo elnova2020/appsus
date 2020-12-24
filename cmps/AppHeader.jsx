@@ -35,7 +35,8 @@ class _AppHeader extends React.Component {
                     <li><NavLink exact to="/keep">ME Keep</NavLink></li>
                     <li><NavLink exact to="/about">About</NavLink></li>
                 </ul>
-                <div className="center">
+            </nav>
+                {/* <div className="center">
                     <h1>My App</h1>
                     <a className="small" onClick={this.goToAbout}>
                         Meet the team
@@ -44,7 +45,7 @@ class _AppHeader extends React.Component {
             </nav>
             {msg && <div className="user-msg">
                 {msg}
-            </div>}
+            </div>} */}
         </header>
     }
 }

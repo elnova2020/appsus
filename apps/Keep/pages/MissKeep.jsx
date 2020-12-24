@@ -1,6 +1,7 @@
 import { noteService } from "../services/noteService.js"
 import { NoteFilter } from "../cmps/NoteFilter.jsx"
 import {NotesList} from "../cmps/NotesList.jsx"
+import { NewNote } from "../cmps/NewNote.jsx";
 
 const { Link } = ReactRouterDOM;
 
@@ -8,9 +9,7 @@ export class MissKeep extends React.Component {
 
     state = {
         notes: [],
-        filterBy : {
-            title: ''
-        }
+        filterBy : null
     }
 
     componentDidMount() {
@@ -31,10 +30,10 @@ export class MissKeep extends React.Component {
 
         const { filterBy } = this.state;
 
-        if (!filterBy.title === '')
+        if (!filterBy)
             return this.state.notes;
         
-        const filterRegex = new RegExp(filterBy.name, 'i');
+        const filterRegex = new RegExp(filterBy.title, 'i');
         return this.state.notes.filter(note => filterRegex.test(note.title));
     }
 
@@ -43,12 +42,20 @@ export class MissKeep extends React.Component {
         this.setState({ filterBy });
     }
 
+    onAddNote = (note) => {
+        const notesCopy = [...this.state.notes, note]
+        this.setState({
+            notes: notesCopy
+        })
+    }
+
     render() {
         
         const notesForDisplay = this.notesForDisplay;
         return (
             <section className="miss-keep-app">
                 <NoteFilter setFilter={this.onSetFilter} />
+                <NewNote addNote={this.onAddNote}/>
                 {/* <Link className="btn" to="/note/edit">Add Note</Link> */}
                 <h2>My Notes</h2>
                 {this.state.notes.length > 0 && <NotesList notes={notesForDisplay} onRemove={this.onRemoveNote}/> }

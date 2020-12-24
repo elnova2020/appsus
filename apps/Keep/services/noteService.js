@@ -43,17 +43,23 @@ var gNotes = [
     {
         id: utilService.makeId(),
         title: 'Birthday',
-        text: 'Buy a present'
+        text: 'Buy a present',
+        picture: null,
+        backgroundColor: 'pink'
     },
     {
         id: utilService.makeId(),
         title: 'Hotel Order',
-        text: 'Need to call to confirm a reservation'
+        text: 'Need to call to confirm a reservation',
+        picture: null,
+        backgroundColor: 'white'
     },
     {
         id: utilService.makeId(),
         title: 'Shopping list',
-        text: 'Eggs, milk, salad, chease, some sweets'
+        text: 'Eggs, milk, salad, chease, some sweets',
+        picture: null,
+        backgroundColor: 'lightblue'
     }
 ]
 
