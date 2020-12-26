@@ -1,15 +1,19 @@
 import { noteService } from "../services/noteService.js"
 import { NoteFilter } from "../cmps/NoteFilter.jsx"
-import {NotesList} from "../cmps/NotesList.jsx"
+import { NotesList } from "../cmps/NotesList.jsx"
 import { NewNote } from "../cmps/NewNote.jsx";
+import { NoteModal } from "../cmps/NoteModal.jsx"
 
 const { Link } = ReactRouterDOM;
 
 export class MissKeep extends React.Component {
 
     state = {
-        notes: [],
-        filterBy : null
+        // notes: [],
+        pinned: [],
+        other: [],
+        filterBy: null,
+        noteToShow: null
     }
 
     componentDidMount() {
@@ -17,13 +21,9 @@ export class MissKeep extends React.Component {
     }
 
     loadNotes = () => {
-        noteService.getNotes().then((notes)=>this.setState({notes}))
-    }
-
-    onRemoveNoete = (noteId) => {
-        noteService.remove(noteId).then(() => {
-            this.loadNotes()
-        })
+        // noteService.getNotes().then((notes) => this.setState({ notes }))
+        noteService.getPinnedNotes().then(pinned => this.setState({pinned}))
+        noteService.getOtherNotes().then(other => this.setState({other}))
     }
 
     get notesForDisplay() {
@@ -32,7 +32,7 @@ export class MissKeep extends React.Component {
 
         if (!filterBy)
             return this.state.notes;
-        
+
         const filterRegex = new RegExp(filterBy.title, 'i');
         return this.state.notes.filter(note => filterRegex.test(note.title));
     }
@@ -43,23 +43,73 @@ export class MissKeep extends React.Component {
     }
 
     onAddNote = (note) => {
-        const notesCopy = [...this.state.notes, note]
+        
+        const notesCopy = (note.isPinned) ? [...this.state.pinned, note] : [...this.state.other, note]
+
         this.setState({
             notes: notesCopy
         })
     }
 
+    onRemoveNote = (noteId) => {
+        noteService.remove(noteId).then(() => {
+            this.loadNotes()
+        })
+    }
+
+    onSelectNote = (note) => {
+
+        const noteToShow = { ...note };
+        this.state.noteToShow = noteToShow;
+        this.setState({ noteToShow });
+
+        console.log('App: onSelected: state noteToShow ', this.state.noteToShow);
+    }
+
+    onPinNote = (note) => {
+        note.isPinned = !note.isPinned
+        noteService.save(note).then(() => {
+            this.loadNotes()
+        })
+    }
+
+    onUpdateNote = () => {
+        this.loadNotes()
+    }
+
     render() {
+
+        // const notesForDisplay = this.notesForDisplay
+        const pinnedNotes = this.state.pinned
+        const otherNotes = this.state.other
+        const noteToShow = this.state.noteToShow
         
-        const notesForDisplay = this.notesForDisplay;
         return (
             <section className="miss-keep-app">
                 <NoteFilter setFilter={this.onSetFilter} />
-                <NewNote addNote={this.onAddNote}/>
-                {/* <Link className="btn" to="/note/edit">Add Note</Link> */}
+                <NewNote addNote={this.onAddNote} />
                 <h2>My Notes</h2>
-                {this.state.notes.length > 0 && <NotesList notes={notesForDisplay} onRemove={this.onRemoveNote}/> }
+                <div className="pinned-list">
+                    <h3>PINNED</h3>
+                    {pinnedNotes.length > 0 && <NotesList notes={pinnedNotes}
+                        onSelect={this.onSelectNote}
+                        onRemove={this.onRemoveNote}
+                        onUpdate={this.onUpdateNote}
+                        onPin={this.onPinNote}
+
+                    />}
+                    {this.state.noteToShow && <NoteModal note={noteToShow} onUpdate={this.onUpdateNote} />}
+                </div>
+                <div className="other-list">
+                    <h3>OTHER</h3>
+                    {otherNotes.length > 0 && <NotesList notes={otherNotes}
+                        onSelect={this.onSelectNote}
+                        onRemove={this.onRemoveNote}
+                        onUpdate={this.onUpdateNote}
+                        onPin={this.onPinNote} />}
+                    {this.state.noteToShow && <NoteModal note={noteToShow} onUpdate={this.onUpdateNote} />}
+                </div>
             </section>
-        );
+        )
     }
 }

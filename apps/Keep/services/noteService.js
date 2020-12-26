@@ -6,7 +6,10 @@ const KEY = 'notesDB'
 export const noteService = {
     save,
     remove,
-    getNotes
+    getNotes,
+    getById,
+    getPinnedNotes,
+    getOtherNotes
 }
 
 // var gNotes = [
@@ -22,51 +25,29 @@ export const noteService = {
 //         info: {
 //             url: '',
 //             title: 'Good memories...'
-//         },
-//         style: {
-//             backgroundColor: "#00d"
-//         }
-//     },
-//     {
-//         type: "NoteTodos",
-//         info: {
-//             label: 'Planning a new year party',
-//             todos: [
-//                 { txt : 'To buy presents', doneAt: null },
-//                 { txt : 'Cook a cake', doneAt: 19999999}
-//             ]
-//         }
-//     }
-// ]
 
-var gNotes = [
-    {
-        id: utilService.makeId(),
-        title: 'Birthday',
-        text: 'Buy a present',
-        picture: null,
-        backgroundColor: 'pink'
-    },
-    {
-        id: utilService.makeId(),
-        title: 'Hotel Order',
-        text: 'Need to call to confirm a reservation',
-        picture: null,
-        backgroundColor: 'white'
-    },
-    {
-        id: utilService.makeId(),
-        title: 'Shopping list',
-        text: 'Eggs, milk, salad, chease, some sweets',
-        picture: null,
-        backgroundColor: 'lightblue'
+var gNotes
+_createNotes()
+
+function _createNotes() {
+    // Try loading from localStorage
+    gNotes = storageService.load(KEY);
+    if (!gNotes || !gNotes.length) {
+        // Nothing in localStorage, use demo data
+        gNotes = _getDemoNotes()
+        _saveNotesToStorage();
     }
-]
+}
 
 function remove(noteId) {
     gNotes = gNotes.filter(note => note.id !== noteId);
     _saveNotesToStorage();
     return Promise.resolve();
+}
+
+function getById(noteId) {
+    const note = gNotes.find(note => note.id === noteId)
+    return Promise.resolve(note)
 }
 
 function getNotes() {
@@ -79,6 +60,16 @@ function getNotesByType(type){
 
 function getNotesByContent(searchText){
     return gNotes.info.title.includes(searchText)
+}
+
+function getPinnedNotes() {
+    const pinned = gNotes.filter(note => note.isPinned)
+    return Promise.resolve(pinned)
+}
+
+function getOtherNotes() {
+    const other = gNotes.filter(note => { return !note.isPinned})
+    return Promise.resolve(other)
 }
 
 function save(note) {
@@ -100,6 +91,8 @@ function _add(note) {
 }
 
 function _update(note) {
+
+    console.log("Update note ", note);
     const noteToUpdate = {
         ...note
     };
@@ -113,4 +106,36 @@ function _update(note) {
 
 function _saveNotesToStorage() {
     storageService.save(KEY, gNotes)
+}
+
+function _getDemoNotes() {
+    
+    const notes = [
+        {
+            id: utilService.makeId(),
+            title: 'Birthday',
+            text: 'Buy a present',
+            picture: null,
+            backgroundColor: 'pink',
+            isPinned: true
+        },
+        {
+            id: utilService.makeId(),
+            title: 'Hotel Order',
+            text: 'Need to call to confirm a reservation',
+            picture: null,
+            backgroundColor: 'white',
+            isPinned: false
+        },
+        {
+            id: utilService.makeId(),
+            title: 'Shopping list',
+            text: 'Eggs, milk, salad, chease, some sweets',
+            picture: null,
+            backgroundColor: 'lightblue',
+            isPinned: false
+        }
+    ]
+
+    return notes;
 }
